@@ -43,11 +43,18 @@ def register():
         return redirect(url_for("home"))
     form = RegistrationForm()
     if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
-        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode(
+            "utf-8"
+        )
+        user = User(
+            username=form.username.data, email=form.email.data, password=hashed_password
+        )
         db.session.add(user)
         db.session.commit()
-        flash(f"Your account has been created! You are now able to log in", category="success")
+        flash(
+            f"Your account has been created! You are now able to log in",
+            category="success",
+        )
         return redirect(url_for("login"))
     return render_template("register.html", title="Register", form=form)
 
@@ -94,6 +101,13 @@ def account():
     form = UpdateAccountForm()
     if form.validate_on_submit():
         if form.picture.data:
+            # First, delete existing profile picture if not default
+            if current_user.image_file != "default.jpg":
+                os.remove(
+                    os.path.join(
+                        app.root_path, "static/profile_pics", current_user.image_file
+                    )
+                )
             current_user.image_file = save_picture(form.picture.data)
         current_user.username = form.username.data
         current_user.email = form.email.data
@@ -104,4 +118,6 @@ def account():
         form.username.data = current_user.username
         form.email.data = current_user.email
     image_file = url_for("static", filename="profile_pics/" + current_user.image_file)
-    return render_template("account.html", title="Account", image_file=image_file, form=form)
+    return render_template(
+        "account.html", title="Account", image_file=image_file, form=form
+    )
