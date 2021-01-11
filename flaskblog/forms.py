@@ -9,6 +9,7 @@ from wtforms import (
     PasswordField,
     SubmitField,
     BooleanField,
+    TextAreaField,
     ValidationError,
 )
 from wtforms.validators import DataRequired, Length, Email, EqualTo
@@ -74,3 +75,10 @@ class UpdateAccountForm(FlaskForm):
             user = User.query.filter_by(email=email.data).first()
             if user:  # user already exists
                 raise ValidationError("That email is taken. Please choose a different one.")
+
+
+class PostForm(FlaskForm):
+    """PostForm"""
+    title = StringField("Title", validators=[DataRequired()])
+    content = TextAreaField("Content", validators=[DataRequired()])
+    submit = SubmitField("Post")
